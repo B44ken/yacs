@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useCourses, type Course } from "@/component/Context";
+import { type Course, useCourses } from "@/component/Context";
 import coursesData from "@/public/courses.json";
 
 const courses = coursesData as Course[];

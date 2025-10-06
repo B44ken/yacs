@@ -2,12 +2,12 @@
 
 import {
   createContext,
-  useContext,
-  useMemo,
-  useState,
   type Dispatch,
   type PropsWithChildren,
   type SetStateAction,
+  useContext,
+  useMemo,
+  useState,
 } from "react";
 
 export type Course = {
@@ -37,5 +37,7 @@ export default function Context({ children }: PropsWithChildren) {
   const [added, setAdded] = useState<Course[]>([]);
   const value = useMemo(() => ({ added, setAdded }), [added]);
 
-  return <CoursesContext.Provider value={value}>{children}</CoursesContext.Provider>;
+  return (
+    <CoursesContext.Provider value={value}>{children}</CoursesContext.Provider>
+  );
 }
