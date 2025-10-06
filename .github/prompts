@@ -1,0 +1,4 @@
+i use copilot to scaffold out features, your purpose is not necessarily to build bulletproof systems. this means
+- write the minimum amount of code
+- catch only obvious errors, if at all
+- never add extra features

@@ -1,17 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type Course, useCourses } from "@/component/Context";
-import coursesData from "@/public/courses.json";
-
-const courses = coursesData as Course[];
 
 export const CourseSearch = () => {
   const [search, setSearch] = useState("");
+  const [results, setResults] = useState<Course[]>([]);
   const { setAdded } = useCourses();
-  const filtered = courses.filter(({ course }) =>
-    course.toLowerCase().includes(search.toLowerCase()),
-  );
+
+  useEffect(() => {
+    const query = search.trim();
+    const endpoint = query
+      ? `/api/courses?q=${encodeURIComponent(query)}`
+      : "/api/courses";
+    const controller = new AbortController();
+
+    (async () => {
+      try {
+        const response = await fetch(endpoint, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+        const payload = await response.json();
+        if (Array.isArray(payload)) {
+          setResults(payload as Course[]);
+        } else {
+          setResults([]);
+        }
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") {
+          console.error(error);
+          setResults([]);
+        }
+      }
+    })();
+
+    return () => {
+      controller.abort();
+    };
+  }, [search]);
+
+  const filtered = results;
 
   return (
     <div className="flex flex-col w-full">
