@@ -1,6 +1,6 @@
 import courses from "@/public/courses.json";
 
-const makeStyle = (start, end, topTime = 11 * 60, bottomTime = 22 * 60) => {
+const makeStyle = (start: string, end: string, topTime = 11 * 60, bottomTime = 22 * 60) => {
   const startMinutes =
     start.split(":").map(Number)[0] * 60 + start.split(":").map(Number)[1];
   const endMinutes =
