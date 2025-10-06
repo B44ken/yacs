@@ -1,7 +1,5 @@
 # yet another course scheduler
 
-**this is a clone of [b44ken/yacs](github.com/b44ken/yacs)**
-
 ## features
 - [x] static site (cloudflare pages)
 - [ ] courses database (cloudflare d1)
