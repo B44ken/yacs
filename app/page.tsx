@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Calendar from "@/component/Calendar";
-import Context from "@/component/Context";
-import { CourseSearch, CoursesAdded } from "@/component/Courses";
-import { Terminal, TerminalLayout } from "@/component/Terminal";
+import Calendar from "../component/Calendar";
+import Context from "../component/Context";
+import { CourseSearch, CoursesAdded } from "../component/Courses";
+import { Terminal, TerminalLayout } from "../component/Terminal";
 
-export const metadata: Metadata = { title: "yet another course scheduler" };
+export const metadata: Metadata = { title: "course scheduler blablabla" };
 
 export default () => {
   return (

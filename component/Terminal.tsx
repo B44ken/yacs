@@ -7,10 +7,10 @@ export const Terminal = ({ title, children, grid }: TerminalProps) => {
   grid = { x: grid.x || 0, y: grid.y || 0, w: grid.w || 1, h: grid.h || 1 };
   return (
     <div
-      className="rounded-lg border border-slate-700 shadow-2xl flex min-h-0 flex-col"
+      className="rounded-lg border border-slate-600 shadow-2xl flex min-h-0 flex-col"
       style={{ gridRow: `span ${grid.h}`, gridColumn: `span ${grid.w}` }}
     >
-      <div className="bg-slate-800 border-b border-slate-700 flex p-1">
+      <div className="bg-slate-800 border-b border-slate-600 flex p-1">
         <span className="flex items-center">{title}</span>
       </div>
       {children && (

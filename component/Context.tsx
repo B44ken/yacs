@@ -1,43 +1,45 @@
 "use client";
 
-import {
-  createContext,
-  type Dispatch,
-  type PropsWithChildren,
-  type SetStateAction,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-
+type Meetings = {name: string; times: Array<{ day: string; start: number; end: number }>}[];
 export type Course = {
-  course: string;
-  day: string;
-  start: string;
-  end: string;
-  location: string;
-};
-
-type CoursesContextValue = {
-  added: Course[];
-  setAdded: Dispatch<SetStateAction<Course[]>>;
-};
-
-const CoursesContext = createContext<CoursesContextValue | null>(null);
-
-export function useCourses() {
-  const context = useContext(CoursesContext);
-  if (!context) {
-    throw new Error("useCourses must be used within the Context provider");
-  }
-  return context;
+    code: string;
+    name: string;
+    description: string;
+    sections: { lec: Meetings; tut: Meetings; pra: Meetings; }
 }
 
-export default function Context({ children }: PropsWithChildren) {
-  const [added, setAdded] = useState<Course[]>([]);
-  const value = useMemo(() => ({ added, setAdded }), [added]);
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
-  return (
-    <CoursesContext.Provider value={value}>{children}</CoursesContext.Provider>
-  );
+const context = createContext<any>(null);
+export const useCourses = () => useContext(context);
+
+export default function Context({ children }: { children: React.ReactNode }) {
+  const [added, setAdded] = useState<{ [key: string]: Course }>({});
+  const [picks, setPicks] = useState<{ [key: string]: { lec: number; tut: number | null; pra: number | null } }>({});
+
+  const courseClick = useCallback((course: Course) => {
+    if (added[course.code]) {
+      delete added[course.code];
+      setAdded({ ...added });
+    } else {
+      setAdded({ ...added, [course.code]: course })
+      setPicks({
+        ...picks,
+        [course.code]: { lec: 0, tut: course.sections.tut.length > 0 ? 0 : null, pra: course.sections.pra.length > 0 ? 0 : null }
+      })
+    }
+  }, [added, picks]);
+
+  const changePick = useCallback((courseCode: string, type: 'lec' | 'tut' | 'pra') => {
+    const newPicks = { ...picks };
+
+    const num = added[courseCode].sections[type].length;
+    if (num > 0)
+      newPicks[courseCode][type] = (newPicks[courseCode][type]! + 1) % num;
+
+    setPicks(newPicks);
+  }, [added, picks]);
+
+  const val = useMemo(() => ({ added, picks, setAdded, courseClick, changePick }), [added, picks, setAdded, courseClick, changePick]);
+  return <context.Provider value={val}>{children}</context.Provider>
 }

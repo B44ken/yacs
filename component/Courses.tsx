@@ -1,85 +1,67 @@
 "use client";
+import { useEffect, useState } from "react"
+import { useCourses } from "./Context";
 
-import { useState } from "react";
-import { type Course, useCourses } from "@/component/Context";
-import coursesData from "@/public/courses.json";
-
-const courses = coursesData as Course[];
 
 export const CourseSearch = () => {
-  const [search, setSearch] = useState("");
-  const { setAdded } = useCourses();
-  const filtered = courses.filter(({ course }) =>
-    course.toLowerCase().includes(search.toLowerCase()),
-  );
+  const ctx = useCourses()
+  const [search, setSearch] = useState("apm346")
+  const [results, setResults] = useState<any[]>([])
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch('/api/search?q=' + search).then(r => r.json())
+      setResults(response)
+    })()
+  }, [search])
 
   return (
     <div className="flex flex-col w-full">
-      <input
-        type="text"
-        placeholder="Search courses..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full px-2 py-1 mb-2 bg-slate-900 border border-slate-600 rounded text-sm focus:outline-none focus:border-blue-500"
-      />
-      <div className="flex-1 overflow-y-auto space-y-2">
-        {filtered.map((course) => (
-          <button
-            key={JSON.stringify(course)}
-            type="button"
-            className="w-full border border-slate-600 rounded p-2 text-left hover:border-blue-500"
-            onClick={() =>
-              setAdded((prev) => {
-                if (
-                  prev.some(
-                    (existing) =>
-                      JSON.stringify(existing) === JSON.stringify(course),
-                  )
-                ) {
-                  return prev;
-                }
-                return [...prev, course];
-              })
-            }
-          >
-            <div className="font-bold">{course.course}</div>
-            <div className="text-xs text-gray-500">
-              {course.location} • {course.day} {course.start}-{course.end}
-            </div>
-          </button>
-        ))}
+      <div className="flex text-sm">
+        <input
+          type="text" value={search} onChange={e => setSearch(e.target.value)}
+          className="w-full px-2 py-1 mb-2 bg-slate-900 border border-slate-600 rounded focus:outline-none focus:border-blue-500"
+        />
+        {/* todo fix hardcode 30px */}
+        <select className="w-16 h-[30px]"> <optgroup label="term">
+          <option value="20261">2026W</option>
+        </optgroup> </select>
       </div>
+      {results.map(c =>
+        <button className="w-full border border-slate-600 rounded p-2 text-left hover:border-blue-500 my-1"
+          onClick={() => ctx.courseClick(c)} key={c.code}
+        >
+          {c.code} <span className="text-slate-400"> {c.name} </span>
+        </button>)}
     </div>
   );
-};
+}
 
 export const CoursesAdded = () => {
-  const { added, setAdded } = useCourses();
+  const ctx = useCourses()
+
+  const showSections = (course: any) => {
+    const lec = course.sections.lec[ctx.picks[course.code]?.lec]?.name
+    const tut = course.sections.tut[ctx.picks[course.code]?.tut]?.name
+    const pra = course.sections.pra[ctx.picks[course.code]?.pra]?.name
+
+    return <>
+      {lec && <button className="underline mr-2" onClick={() => ctx.changePick(course.code, 'lec')}> {lec} </button>}
+      {tut && <button className="underline mr-2" onClick={() => ctx.changePick(course.code, 'tut')}> {tut} </button>}
+      {pra && <button className="underline mr-2" onClick={() => ctx.changePick(course.code, 'pra')}> {pra} </button>}
+      <button className="underline mr-2">flexible</button>
+    </>
+
+  }
+
   return (
     <div className="flex flex-col w-full">
-      <div className="font-bold mb-2">Added ({added.length})</div>
-      <div className="flex-1 overflow-y-auto space-y-2">
-        {added.map((course) => (
-          <button
-            key={JSON.stringify(course)}
-            type="button"
-            className="w-full border border-slate-600 rounded p-2 text-left hover:border-red-500"
-            onClick={() =>
-              setAdded((prev) =>
-                prev.filter(
-                  (existing) =>
-                    JSON.stringify(existing) !== JSON.stringify(course),
-                ),
-              )
-            }
-          >
-            <div className="font-bold">{course.course}</div>
-            <div className="text-xs text-gray-500">
-              {course.location} • {course.day} {course.start}-{course.end}
-            </div>
-          </button>
-        ))}
-      </div>
+      {Object.values(ctx.added).map((c: any) =>
+        <div className="w-full border border-slate-600 rounded p-2 text-left my-1" key={c.code}>
+          {c.code} <span className="text-slate-400"> {c.name} </span>
+          <div> {showSections(c)} </div>
+        </div>)}
+
     </div>
   );
-};
+}

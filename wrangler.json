@@ -1,0 +1,12 @@
+{
+  "compatibility_date": "2025-10-01",
+  "d1_databases": [
+    { "binding": "db", "database_id": "18d1b5de-f6a7-4d24-a6ad-7e229ae89f14" }
+  ],
+  "name": "yacs",
+  "main": "workers/index.ts",
+  "assets": {
+    "directory": "./out",
+    "binding": "out"
+  }
+}
